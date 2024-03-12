@@ -65,7 +65,7 @@ public class BatchConfiguration {
 		return new StepBuilder("cryptoPriceStep", jobRepository)
 				.<CryptoPrice, CryptoPrice>chunk(10, transactionManager)
 				.reader(cryptoPriceReader(batchJobDays))
-				.writer(cryptoPriceWriter())
+				.writer(cryptoPriceWriter(batchJobDays))
 				.build();
 	}
 	
@@ -75,8 +75,8 @@ public class BatchConfiguration {
 	}
 	
 	@Bean
-	public ItemWriter<CryptoPrice> cryptoPriceWriter() {
-		return new CryptoPriceWriter();
+	public ItemWriter<CryptoPrice> cryptoPriceWriter(String batchJobDays) {
+		return new CryptoPriceWriter(batchJobDays);
 	}
 	 
 }

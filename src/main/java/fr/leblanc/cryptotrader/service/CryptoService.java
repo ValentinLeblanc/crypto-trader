@@ -16,7 +16,7 @@ public class CryptoService {
 		this.hysteresisRatio = hysteresisRatio;
 	}
 
-	public void optimize(CryptoContext cryptoContext, CryptoPrice newCryptoPrice) {
+	public void optimizeGain(CryptoContext cryptoContext, CryptoPrice newCryptoPrice) {
 		if (cryptoContext.isActive()) {
 			if (newCryptoPrice.price() > cryptoContext.getOptimum()) {
 				cryptoContext.setOptimum(newCryptoPrice.price());
