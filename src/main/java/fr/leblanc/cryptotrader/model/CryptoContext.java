@@ -11,7 +11,7 @@ public class CryptoContext {
 	
 	private Double optimum = 0d;
 	
-	private Double value = 0d;
+	private Double value;
 
 	public Double getValue() {
 		return value;

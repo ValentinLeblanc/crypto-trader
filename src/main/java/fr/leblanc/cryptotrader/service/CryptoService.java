@@ -9,10 +9,14 @@ import fr.leblanc.cryptotrader.model.CryptoPrice;
 @Service
 public class CryptoService {
 
-	@Value("${crypto.hysteresis.ratio}")
-	private Double hysteresisRatio;
+	private final Double hysteresisRatio;
 
-	public boolean check(CryptoContext cryptoContext, CryptoPrice newCryptoPrice) {
+	public CryptoService(@Value("${crypto.hysteresis.ratio}") Double hysteresisRatio) {
+		super();
+		this.hysteresisRatio = hysteresisRatio;
+	}
+
+	public void optimize(CryptoContext cryptoContext, CryptoPrice newCryptoPrice) {
 		if (cryptoContext.isActive()) {
 			if (newCryptoPrice.price() > cryptoContext.getOptimum()) {
 				cryptoContext.setOptimum(newCryptoPrice.price());
@@ -26,15 +30,16 @@ public class CryptoService {
 				cryptoContext.setActive(true);
 			}
 		}
-
 		if (cryptoContext.isActive()) {
-			double diffValue = newCryptoPrice.price() - (cryptoContext.getCryptoPriceList().isEmpty() ? 0d
-					: cryptoContext.getCryptoPriceList().get(cryptoContext.getCryptoPriceList().size() - 1).price());
-			cryptoContext.setValue(cryptoContext.getValue() + diffValue);
+			if (cryptoContext.getValue() == null) {
+				cryptoContext.setValue(100d);
+			} else {
+				CryptoPrice previousCryptoPrice = cryptoContext.getCryptoPriceList().get(cryptoContext.getCryptoPriceList().size() - 1);
+				double diffValue = (newCryptoPrice.price() - previousCryptoPrice.price()) * 100 / previousCryptoPrice.price();
+				cryptoContext.setValue(cryptoContext.getValue() + diffValue);
+			}
 		}
-
 		cryptoContext.getCryptoPriceList().add(newCryptoPrice);
-		return cryptoContext.isActive();
 	}
 
 }
