@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "batch.job.enabled",
+    "type": "java.lang.String",
+    "description": "A description for 'batch.job.enabled'"
+  },
+  {
+    "name": "batch.job.days",
+    "type": "java.lang.String",
+    "description": "A description for 'batch.job.days'"
+  },
+  {
+    "name": "crypto.hysteresis.ratio",
+    "type": "java.lang.String",
+    "description": "A description for 'crypto.hysteresis.ratio'"
+  }
+]}
