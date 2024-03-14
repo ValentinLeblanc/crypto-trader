@@ -3,8 +3,7 @@ package fr.leblanc.cryptotrader.service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import fr.leblanc.cryptotrader.model.CryptoContext;
-import fr.leblanc.cryptotrader.model.CryptoPrice;
+import fr.leblanc.cryptotrader.model.CryptoTracker;
 
 @Service
 public class CryptoService {
@@ -16,30 +15,26 @@ public class CryptoService {
 		this.hysteresisRatio = hysteresisRatio;
 	}
 
-	public void optimizeGain(CryptoContext cryptoContext, CryptoPrice newCryptoPrice) {
-		if (cryptoContext.isActive()) {
-			if (newCryptoPrice.price() > cryptoContext.getOptimum()) {
-				cryptoContext.setOptimum(newCryptoPrice.price());
-			} else if (newCryptoPrice.price() < hysteresisRatio * cryptoContext.getOptimum()) {
-				cryptoContext.setActive(false);
+	public void updateTracker(CryptoTracker cryptoTracker, double newPrice) {
+		cryptoTracker.addIteration();
+		if (cryptoTracker.isActive()) {
+			double gain = newPrice - cryptoTracker.getCurrentPrice();
+			cryptoTracker.addGain(gain);
+			if (newPrice > cryptoTracker.getOptimum()) {
+				cryptoTracker.setOptimum(newPrice);
+			} else if (newPrice < hysteresisRatio * cryptoTracker.getOptimum()) {
+				cryptoTracker.setOptimum(newPrice);
+				cryptoTracker.setActive(false);
 			}
 		} else {
-			if (newCryptoPrice.price() < cryptoContext.getOptimum()) {
-				cryptoContext.setOptimum(newCryptoPrice.price());
-			} else if (newCryptoPrice.price() > hysteresisRatio * cryptoContext.getOptimum()) {
-				cryptoContext.setActive(true);
+			if (newPrice < cryptoTracker.getOptimum()) {
+				cryptoTracker.setOptimum(newPrice);
+			} else if (newPrice > (1 + (1 - hysteresisRatio) / 10) * cryptoTracker.getOptimum()) {
+				cryptoTracker.setOptimum(newPrice);
+				cryptoTracker.setActive(true);
 			}
 		}
-		if (cryptoContext.isActive()) {
-			if (cryptoContext.getValue() == null) {
-				cryptoContext.setValue(100d);
-			} else {
-				CryptoPrice previousCryptoPrice = cryptoContext.getCryptoPriceList().get(cryptoContext.getCryptoPriceList().size() - 1);
-				double diffValue = (newCryptoPrice.price() - previousCryptoPrice.price()) * 100 / previousCryptoPrice.price();
-				cryptoContext.setValue(cryptoContext.getValue() + diffValue);
-			}
-		}
-		cryptoContext.getCryptoPriceList().add(newCryptoPrice);
+		cryptoTracker.setCurrentPrice(newPrice);
 	}
 
 }
