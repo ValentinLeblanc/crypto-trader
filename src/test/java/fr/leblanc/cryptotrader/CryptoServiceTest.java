@@ -29,16 +29,16 @@ class CryptoServiceTest {
 	}
 
 	private void gainTest(double hysteresisRatio, CryptoService cryptoService, String filePath) {
-		JSONObject cryptoPriceData = ResourceUtils.parseJSON("./src/test/resources/" + filePath + ".json");
+		JSONObject cryptoPriceData = ResourceUtils.parseJSON("./src/main/resources/" + filePath + ".json");
 		JSONArray cryptoPriceArray = cryptoPriceData.getJSONArray("cryptoPriceArray");
 		List<CryptoPrice> cryptoPrices = new ArrayList<>();
 		for (int i = 0; i < cryptoPriceArray.length(); i++) {
 			JSONObject cryptoPriceJson = cryptoPriceArray.getJSONObject(i);
 			cryptoPrices.add(new CryptoPrice(cryptoPriceJson.getLong("date"), cryptoPriceJson.getDouble("price")));
 		}
-		CryptoTracker cryptoTracker = new CryptoTracker(cryptoPrices.get(0).price());
+		CryptoTracker cryptoTracker = new CryptoTracker(cryptoPrices.get(0).getPrice());
 		for (CryptoPrice cryptoPrice : cryptoPrices) {
-			cryptoService.updateTracker(cryptoTracker, cryptoPrice.price());
+			cryptoService.updateTracker(cryptoTracker, cryptoPrice.getPrice());
 		}
 		System.out.println(filePath);
 		System.out.println("ratio = " + hysteresisRatio);

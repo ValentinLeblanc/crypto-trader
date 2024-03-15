@@ -16,35 +16,29 @@ import org.springframework.batch.item.ItemWriter;
 import fr.leblanc.cryptotrader.model.CryptoPrice;
 import fr.leblanc.cryptotrader.utils.ResourceUtils;
 
-public class CryptoPriceWriter implements ItemWriter<CryptoPrice>, StepExecutionListener {
+public class CryptoPriceFlatFileWriter implements ItemWriter<CryptoPrice>, StepExecutionListener {
 
 	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yy");
 
 	private static final String OUTPUT_FILE = "src/main/resources/%s,%sd.json";
 	
-	private static final Logger logger = LoggerFactory.getLogger(CryptoPriceWriter.class);
-
+	private static final Logger logger = LoggerFactory.getLogger(CryptoPriceFlatFileWriter.class);
 
 	private JSONArray cryptoPricesJsonArray = new JSONArray();
-
-	private String batchJobDays;
-
-	public CryptoPriceWriter(String batchJobDays) {
-		this.batchJobDays = batchJobDays;
-	}
 
 	@Override
 	public void write(Chunk<? extends CryptoPrice> chunk) throws Exception {
 		for (CryptoPrice cryptoPrice : chunk.getItems()) {
 			JSONObject cryptoPriceJson = new JSONObject();
-			cryptoPriceJson.put("date", cryptoPrice.date());
-			cryptoPriceJson.put("price", cryptoPrice.price());
+			cryptoPriceJson.put("date", cryptoPrice.getDate());
+			cryptoPriceJson.put("price", cryptoPrice.getPrice());
 			cryptoPricesJsonArray.put(cryptoPriceJson);
 		}
 	}
 
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
+		String batchJobDays = stepExecution.getJobParameters().getString("batchJobDays");
 		JSONObject cryptoPriceData = new JSONObject();
 		cryptoPriceData.put("date", System.currentTimeMillis());
 		cryptoPriceData.put("cryptoPriceArray", cryptoPricesJsonArray);

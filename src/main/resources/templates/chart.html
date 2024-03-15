@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bitcoin price evolution</title>
+<!-- Load Google Charts -->
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script th:inline="javascript">
+	/*<![CDATA[*/
+	var cryptoPrices = /*[[${cryptoPrices}]]*/[];
+	/*]]>*/
+</script>
+<script type="text/javascript">
+	google.charts.load('current', {
+		'packages' : [ 'corechart' ]
+	});
+	google.charts.setOnLoadCallback(drawChart);
+
+	function drawChart() {
+
+		// Create data table
+		var data = new google.visualization.DataTable();
+		data.addColumn('datetime', 'Date');
+		data.addColumn('number', 'Price');
+
+		// Add data to the data table
+		for (var i = 0; i < cryptoPrices.length; i++) {
+			var dateTime = new Date(cryptoPrices[i].date);
+			data.addRow([ dateTime, cryptoPrices[i].price ]);
+		}
+
+		var options = {
+			title : 'Bitcoin price',
+			curveType : 'function',
+			legend : {
+				position : 'bottom'
+			},
+			hAxis : {
+				title : 'Date and Time'
+			},
+			explorer : {
+				actions : [ 'dragToZoom', 'rightClickToReset' ],
+				axis : 'horizontal',
+				keepInBounds : true,
+				maxZoomIn : 4.0
+			},
+		};
+
+		var chart = new google.visualization.LineChart(document
+				.getElementById('curve_chart'));
+
+		chart.draw(data, options);
+		
+		// Function to handle button click event
+	      document.getElementById('importButton').addEventListener('click', function() {
+	        // Call the /import endpoint
+	        fetch('/import')
+	          .then(response => {
+	        	  window.location.reload();
+	          })
+	          .catch(error => {
+	            // Handle errors here if needed
+	            console.error('Error occurred during import:', error);
+	          });
+	      });
+	}
+</script>
+</head>
+<body>
+	<div id="curve_chart" style="width: 900px; height: 500px"></div>
+	<button id="importButton" style="margin-left: 400px;">Import Data</button>
+</body>
+</html>

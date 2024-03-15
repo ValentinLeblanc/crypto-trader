@@ -13,5 +13,25 @@
     "name": "crypto.hysteresis.ratio",
     "type": "java.lang.String",
     "description": "A description for 'crypto.hysteresis.ratio'"
+  },
+  {
+    "name": "spring.datasource.crypto.url",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.crypto.url'"
+  },
+  {
+    "name": "spring.datasource.crypto.username",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.crypto.username'"
+  },
+  {
+    "name": "spring.datasource.crypto.password",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.crypto.password'"
+  },
+  {
+    "name": "spring.datasource.crypto.driver-class-name",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.datasource.crypto.driver-class-name'"
   }
 ]}

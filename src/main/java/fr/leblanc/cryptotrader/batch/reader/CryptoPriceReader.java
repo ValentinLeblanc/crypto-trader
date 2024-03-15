@@ -24,14 +24,10 @@ public class CryptoPriceReader implements ItemReader<CryptoPrice>, StepExecution
 	private static final Logger logger = LoggerFactory.getLogger(CryptoPriceReader.class);
 	
 	private List<CryptoPrice> cryptoPrices = new ArrayList<>();
-	private String batchJobDays;
 	
-	public CryptoPriceReader(String batchJobDays) {
-		this.batchJobDays = batchJobDays;
-	}
-
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
+		String batchJobDays = stepExecution.getJobParameters().getString("batchJobDays");
         String apiUrl = "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=" + batchJobDays;
         RestTemplate restTemplate = new RestTemplateBuilder().build();
 
