@@ -47,28 +47,46 @@
 			},
 		};
 
-		var chart = new google.visualization.LineChart(document
-				.getElementById('curve_chart'));
+		var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
 
 		chart.draw(data, options);
 		
-		// Function to handle button click event
-	      document.getElementById('importButton').addEventListener('click', function() {
-	        // Call the /import endpoint
-	        fetch('/import')
-	          .then(response => {
-	        	  window.location.reload();
-	          })
-	          .catch(error => {
-	            // Handle errors here if needed
-	            console.error('Error occurred during import:', error);
-	          });
-	      });
+        const importForm = document.getElementById("importForm");
+        const resetButton = document.getElementById("resetButton");
+
+        importForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent form submission
+            var days = document.getElementById("days").value;
+            fetch('/import?days=' + days)
+                .then(response => {
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Error occurred during import:', error);
+                });
+        });
+
+        resetButton.addEventListener('click', function() {
+            fetch('/reset')
+            .then(response => {
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error occurred during reset:', error);
+            });
+        });
 	}
 </script>
 </head>
 <body>
-	<div id="curve_chart" style="width: 900px; height: 500px"></div>
-	<button id="importButton" style="margin-left: 400px;">Import Data</button>
+    <div id="curve_chart" style="width: 900px; height: 500px;"></div>
+    <!-- Form for data import -->
+    <form id="importForm" style="margin-top: 20px; margin-left: 300px;">
+        <label for="days">Days:</label>
+        <input type="number" id="days" name="days">
+        <button type="submit">Import</button>
+        <button type="button" id="resetButton">Reset</button>
+    </form>
 </body>
+
 </html>

@@ -38,13 +38,13 @@ public class CryptoPriceFlatFileWriter implements ItemWriter<CryptoPrice>, StepE
 
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
-		String batchJobDays = stepExecution.getJobParameters().getString("batchJobDays");
+		String days = stepExecution.getJobParameters().getString("days");
 		JSONObject cryptoPriceData = new JSONObject();
 		cryptoPriceData.put("date", System.currentTimeMillis());
 		cryptoPriceData.put("cryptoPriceArray", cryptoPricesJsonArray);
 		LocalDate currentDate = LocalDate.now();
         String formattedDate = currentDate.format(DATE_FORMATTER);
-		String fileName = String.format(OUTPUT_FILE, formattedDate, batchJobDays);
+		String fileName = String.format(OUTPUT_FILE, formattedDate, days);
 		ResourceUtils.storeJSON(cryptoPriceData, fileName);
 		logger.info("'{}' successfully created", fileName);
 		return ExitStatus.COMPLETED;

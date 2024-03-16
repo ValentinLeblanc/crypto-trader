@@ -27,8 +27,8 @@ public class CryptoPriceReader implements ItemReader<CryptoPrice>, StepExecution
 	
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
-		String batchJobDays = stepExecution.getJobParameters().getString("batchJobDays");
-        String apiUrl = "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=" + batchJobDays;
+		String days = stepExecution.getJobParameters().getString("days");
+        String apiUrl = "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=" + days;
         RestTemplate restTemplate = new RestTemplateBuilder().build();
 
         try {

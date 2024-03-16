@@ -13,7 +13,6 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -28,7 +27,6 @@ import fr.leblanc.cryptotrader.repository.CryptoPriceRepository;
 
 @Configuration
 @EnableBatchProcessing(dataSourceRef = "batchDataSource", transactionManagerRef = "batchTransactionManager")
-@ConditionalOnProperty(name = "batch.job.enabled", havingValue = "true", matchIfMissing = true)
 public class CryptoBatchConfiguration {
 	
 	@Bean
@@ -44,7 +42,7 @@ public class CryptoBatchConfiguration {
 	}
 	
 	@Bean
-	public JobLauncher jobLauncher(JobRepository jobRepository) throws Exception {
+	public JobLauncher importCryptoPriceJobLauncher(JobRepository jobRepository) throws Exception {
 		TaskExecutorJobLauncher jobLauncher = new TaskExecutorJobLauncher();
 		jobLauncher.setJobRepository(jobRepository);
 		jobLauncher.afterPropertiesSet();
@@ -52,33 +50,33 @@ public class CryptoBatchConfiguration {
 	}
 	
 	@Bean
-	public Job cryptoPriceJob(JobRepository jobRepository, PlatformTransactionManager batchTransactionManager, CryptoPriceRepository cryptoPriceRepository) {
-		return new JobBuilder("cryptoPriceJob", jobRepository)
-				.start(cryptoStep(jobRepository, batchTransactionManager, cryptoPriceRepository))
+	public Job importCryptoPriceJob(JobRepository jobRepository, PlatformTransactionManager batchTransactionManager, CryptoPriceRepository cryptoPriceRepository) {
+		return new JobBuilder("importCryptoPriceJob", jobRepository)
+				.start(importCryptoPrice(jobRepository, batchTransactionManager, cryptoPriceRepository))
 				.build();
 	}
 	
 	@Bean
-	public Step cryptoStep(JobRepository jobRepository, PlatformTransactionManager batchTransactionManager, CryptoPriceRepository cryptoPriceRepository) {
-		return new StepBuilder("cryptoPriceStep", jobRepository)
+	public Step importCryptoPrice(JobRepository jobRepository, PlatformTransactionManager batchTransactionManager, CryptoPriceRepository cryptoPriceRepository) {
+		return new StepBuilder("importCryptoPriceStep", jobRepository)
 				.<CryptoPrice, CryptoPrice>chunk(10, batchTransactionManager)
-				.reader(cryptoPriceReader())
-				.writer(cryptoPriceDBWriter(cryptoPriceRepository))
+				.reader(importCryptoPriceReader())
+				.writer(importCryptoPriceDBWriter(cryptoPriceRepository))
 				.build();
 	}
 	
 	@Bean
-	public ItemReader<CryptoPrice> cryptoPriceReader() {
+	public ItemReader<CryptoPrice> importCryptoPriceReader() {
 		return new CryptoPriceReader();
 	}
 	
 	@Bean
-	public ItemWriter<CryptoPrice> cryptoPriceFlatFileWriter() {
+	public ItemWriter<CryptoPrice> importCryptoPriceFlatFileWriter() {
 		return new CryptoPriceFlatFileWriter();
 	}
 	
 	@Bean
-	public ItemWriter<CryptoPrice> cryptoPriceDBWriter(CryptoPriceRepository cryptoPriceRepository) {
+	public ItemWriter<CryptoPrice> importCryptoPriceDBWriter(CryptoPriceRepository cryptoPriceRepository) {
 		return new CryptoPriceDBWriter(cryptoPriceRepository);
 	}
 	 
